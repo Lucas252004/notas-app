@@ -4,7 +4,9 @@ import FormularioAuth from './components/FormularioAuth'
 import ListaNotas from './components/ListaNotas'
 import './App.css'
 
-const API = 'http://localhost:3001/api'
+// URL de la API: en producción la define Vite con VITE_API_URL (variable de entorno
+// configurada en Vercel). En desarrollo, usa localhost:3001.
+const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 
 function App() {
   // Estado de los tokens, notas, las vistas del registro y de cargas

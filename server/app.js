@@ -6,7 +6,13 @@ import pool from './db.js'
 import { authMiddleware, SECRET } from './auth.js'
 
 const app = express()
-app.use(cors())
+// CORS: en producción permitimos el dominio de Vercel (se configura en Render).
+// En desarrollo (sin la variable) se permite todo.
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : '*',
+  })
+)
 app.use(express.json())
 // Solicitud POST para registrar un usuario
 app.post('/api/register', async (req, res) => {
