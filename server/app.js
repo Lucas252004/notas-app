@@ -7,10 +7,17 @@ import { authMiddleware, SECRET } from './auth.js'
 
 const app = express()
 // CORS: en producción permitimos el dominio de Vercel (se configura en Render).
-// En desarrollo (sin la variable) se permite todo.
+// Normalizamos los orígenes: quitamos la barra final, porque el navegador envía
+// el Origin SIN "/" y si la variable quedó con barra no coincidiría (bloqueo CORS).
+function normalizarOrigenes(valor) {
+  return valor
+    .split(',')
+    .map((o) => o.trim().replace(/\/$/, ''))
+    .filter(Boolean)
+}
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : '*',
+    origin: process.env.CORS_ORIGIN ? normalizarOrigenes(process.env.CORS_ORIGIN) : '*',
   })
 )
 app.use(express.json())
