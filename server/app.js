@@ -6,18 +6,12 @@ import pool from './db.js'
 import { authMiddleware, SECRET } from './auth.js'
 
 const app = express()
-// CORS: en producción permitimos el dominio de Vercel (se configura en Render).
-// Normalizamos los orígenes: quitamos la barra final, porque el navegador envía
-// el Origin SIN "/" y si la variable quedó con barra no coincidiría (bloqueo CORS).
-function normalizarOrigenes(valor) {
-  return valor
-    .split(',')
-    .map((o) => o.trim().replace(/\/$/, ''))
-    .filter(Boolean)
-}
+// CORS: reflejamos el origen de la petición (seguro para API pública sin cookies,
+// y evita problemas de coincidencia/caché con orígenes escritos con barra final).
+// Si necesitáramos restringir, podríamos comparar contra CORS_ORIGIN.
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN ? normalizarOrigenes(process.env.CORS_ORIGIN) : '*',
+    origin: (origin, cb) => cb(null, origin || true),
   })
 )
 app.use(express.json())
