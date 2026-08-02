@@ -6,7 +6,10 @@ import './App.css'
 
 // URL de la API: en producción la define Vite con VITE_API_URL (variable de entorno
 // configurada en Vercel). En desarrollo, usa localhost:3001.
-const API = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+// Normalizamos: si la variable viene sin "/api" (ej: https://api.com), se lo agregamos,
+// así funciona aunque la configuren con o sin el sufijo.
+const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:3001/api').replace(/\/$/, '')
+const API = API_BASE.endsWith('/api') ? API_BASE : `${API_BASE}/api`
 
 function App() {
   // Estado de los tokens, notas, las vistas del registro y de cargas
