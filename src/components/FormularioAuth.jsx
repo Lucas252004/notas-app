@@ -17,17 +17,19 @@ function FormularioAuth({ titulo, onSubmit, alternativo }) {
 
   return (
     <form className="auth" onSubmit={manejarSubmit}>
+      <div className="auth-logo" aria-hidden="true" />
       <h2>{titulo}</h2>
+      <p className="auth-sub">Tus notas, organizadas y con subtareas.</p>
       <input
         type="email"
-        placeholder="Email"
+        placeholder="Tu email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         required
       />
       <input
         type="password"
-        placeholder="Contraseña"
+        placeholder="Tu contraseña"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
@@ -35,7 +37,9 @@ function FormularioAuth({ titulo, onSubmit, alternativo }) {
       {error && <p className="error">{error}</p>}
       <button type="submit">{titulo}</button>
       <button type="button" className="link" onClick={alternativo}>
-        {titulo === 'Ingresar' ? '¿No tenés cuenta? Registrate' : '¿Ya tenés cuenta? Ingresá'}
+        {titulo === 'Bienvenido de nuevo'
+          ? '¿No tenés cuenta? Creala'
+          : '¿Ya tenés cuenta? Ingresá'}
       </button>
     </form>
   )

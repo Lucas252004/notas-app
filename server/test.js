@@ -105,3 +105,57 @@ test('un usuario no puede borrar notas de otro', async () => {
   })
   assert.equal(borrada.status, 404)
 })
+
+test('flujo de subtareas: crear, completar y listar con la nota', async () => {
+  const token = await registrarUsuario(`subs-${Date.now()}@test.com`)
+
+  const creada = await peticion('/api/notas', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ texto: 'Tarea con subtareas' }),
+  })
+  const nota = await creada.json()
+
+  const sub1 = await peticion(`/api/notas/${nota.id}/subtareas`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ texto: 'Paso uno' }),
+  })
+  assert.equal(sub1.status, 201)
+  const sub1Data = await sub1.json()
+  assert.equal(sub1Data.nota_id, nota.id)
+
+  const completada = await peticion(`/api/subtareas/${sub1Data.id}`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ completada: true }),
+  })
+  assert.equal((await completada.json()).completada, true)
+
+  const listada = await peticion('/api/notas', {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  const notas = await listada.json()
+  const conSubs = notas.find((n) => n.id === nota.id)
+  assert.equal(conSubs.subtareas.length, 1)
+  assert.equal(conSubs.subtareas[0].completada, true)
+})
+
+test('no se puede completar la nota de otro usuario', async () => {
+  const tokenA = await registrarUsuario(`dueno-${Date.now()}@test.com`)
+  const tokenB = await registrarUsuario(`intruso-${Date.now()}@test.com`)
+
+  const creada = await peticion('/api/notas', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${tokenA}` },
+    body: JSON.stringify({ texto: 'Nota protegida' }),
+  })
+  const nota = await creada.json()
+
+  const res = await peticion(`/api/notas/${nota.id}`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${tokenB}` },
+    body: JSON.stringify({ completada: true }),
+  })
+  assert.equal(res.status, 404)
+})

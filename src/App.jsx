@@ -74,19 +74,88 @@ function App() {
     setNotas(notas.filter((n) => n.id !== id))
   }
 
+  async function alternarCompletada(nota) {
+    const completada = !nota.completada
+    const res = await fetch(`${API}/notas/${nota.id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ completada }),
+    })
+    const actualizada = await res.json()
+    setNotas(notas.map((n) => (n.id === nota.id ? actualizada : n)))
+  }
+
+  async function agregarSubtarea(notaId, texto) {
+    const res = await fetch(`${API}/notas/${notaId}/subtareas`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ texto }),
+    })
+    const nueva = await res.json()
+    setNotas(
+      notas.map((n) =>
+        n.id === notaId ? { ...n, subtareas: [...n.subtareas, nueva] } : n
+      )
+    )
+  }
+
+  async function alternarSubtarea(notaId, subtareaId, completada) {
+    const res = await fetch(`${API}/subtareas/${subtareaId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ completada: !completada }),
+    })
+    const actualizada = await res.json()
+    setNotas(
+      notas.map((n) =>
+        n.id === notaId
+          ? {
+              ...n,
+              subtareas: n.subtareas.map((s) =>
+                s.id === subtareaId ? actualizada : s
+              ),
+            }
+          : n
+      )
+    )
+  }
+
+  async function eliminarSubtarea(notaId, subtareaId) {
+    await fetch(`${API}/subtareas/${subtareaId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    setNotas(
+      notas.map((n) =>
+        n.id === notaId
+          ? { ...n, subtareas: n.subtareas.filter((s) => s.id !== subtareaId) }
+          : n
+      )
+    )
+  }
+
   if (!token) {
     return (
       <main className="notas">
         <h1>Mis Notas</h1>
         {vistaRegistro ? (
           <FormularioAuth
-            titulo="Registrarse"
+            titulo="Crear cuenta"
             onSubmit={(email, password) => pedirToken(email, password, 'register')}
             alternativo={() => setVistaRegistro(false)}
           />
         ) : (
           <FormularioAuth
-            titulo="Ingresar"
+            titulo="Bienvenido de nuevo"
             onSubmit={(email, password) => pedirToken(email, password, 'login')}
             alternativo={() => setVistaRegistro(true)}
           />
@@ -104,7 +173,18 @@ function App() {
         </button>
       </div>
       <FormularioNota onAgregar={agregar} />
-      {cargando ? <p>Cargando...</p> : <ListaNotas notas={notas} onEliminar={eliminar} />}
+      {cargando ? (
+        <p>Cargando...</p>
+      ) : (
+        <ListaNotas
+          notas={notas}
+          onEliminar={eliminar}
+          onAlternarCompletada={alternarCompletada}
+          onAgregarSubtarea={agregarSubtarea}
+          onAlternarSubtarea={alternarSubtarea}
+          onEliminarSubtarea={eliminarSubtarea}
+        />
+      )}
     </main>
   )
 }
