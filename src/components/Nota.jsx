@@ -1,5 +1,5 @@
 import { useState } from 'react'
-
+// Funcionalidades de las notas
 function Nota({
   nota,
   onEliminar,
@@ -8,7 +8,7 @@ function Nota({
   onAlternarSubtarea,
   onEliminarSubtarea,
 }) {
-  const [nuevaSubtarea, setNuevaSubtarea] = useState('')
+  const [nuevaSubtarea, setNuevaSubtarea] = useState('') // estado de la nueva subtarea
 
   function agregar(e) {
     e.preventDefault()
@@ -17,11 +17,13 @@ function Nota({
     onAgregarSubtarea(nota.id, texto)
     setNuevaSubtarea('')
   }
-
+// Despliegue visual de una nota, con todas sus funcionalidades para agregar, borrar y actualizar subtareas
   return (
     <li>
       <div className="nota-titulo">
         <div
+          // Clase condicional: si está completada se agrega "completada" al className
+          // y el CSS aplica tachado + color gris (text-decoration: line-through).
           className={`texto${nota.completada ? ' completada' : ''}`}
           onClick={() => onAlternarCompletada(nota)}
         >
@@ -40,6 +42,8 @@ function Nota({
       {nota.subtareas && nota.subtareas.length > 0 && (
         <div className="subtareas">
           {nota.subtareas.map((s) => (
+            // key: React usa esto para identificar cada elemento de la lista.
+            // Es mejor usar un id real de la BD (s.id) que el índice del map.
             <div className="subtarea" key={s.id}>
               <div
                 className={`texto${s.completada ? ' completada' : ''}`}

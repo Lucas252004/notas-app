@@ -7,23 +7,26 @@ import './App.css'
 const API = 'http://localhost:3001/api'
 
 function App() {
+  // Estado de los tokens, notas, las vistas del registro y de cargas
   const [token, setToken] = useState(() => localStorage.getItem('token'))
   const [notas, setNotas] = useState([])
   const [cargando, setCargando] = useState(true)
   const [vistaRegistro, setVistaRegistro] = useState(false)
-
+  // Verficio si esta el token activo
   useEffect(() => {
     if (!token) {
       setCargando(false)
       return
     }
+    // Comienzo a cargar la vista 
     async function cargar() {
       try {
+        // Llamo a la API enviandole el token
         const res = await fetch(`${API}/notas`, {
           headers: { Authorization: `Bearer ${token}` },
         })
-        if (!res.ok) throw new Error('Sesión expirada, volvé a ingresar')
-        const data = await res.json()
+        if (!res.ok) throw new Error('Sesión expirada, volvé a ingresar') // En caso de estar expirada devuelvo un mensaje de error
+        const data = await res.json() // Obtengo un JSON con todos sus datos
         setNotas(data)
       } catch (err) {
         console.error(err)
@@ -46,13 +49,13 @@ function App() {
     setToken(data.token)
     localStorage.setItem('token', data.token)
   }
-
+  // Funcion para cerrar sesion del usuario y por ende remover el token actual
   function cerrarSesion() {
     setToken(null)
     localStorage.removeItem('token')
     setNotas([])
   }
-
+  // Creo solicitud POST para agregar una nota enviandole tambien el token
   async function agregar(texto) {
     const res = await fetch(`${API}/notas`, {
       method: 'POST',
@@ -63,17 +66,20 @@ function App() {
       body: JSON.stringify({ texto }),
     })
     const nueva = await res.json()
-    setNotas([nueva, ...notas])
+    setNotas([nueva, ...notas]) // Agrego esta nueva nota
   }
-
+  // Genero una solicitud de tipo DELETE para borrar una nota
   async function eliminar(id) {
     await fetch(`${API}/notas/${id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     })
+    // INMUTABILIDAD: nunca modifico `notas` directamente, creo un array NUEVO con filter
+    // y ese es el que le paso a setNotas. React necesita un valor nuevo para re-renderizar.
     setNotas(notas.filter((n) => n.id !== id))
   }
-
+  // Genero una solicitud de tipo PATCH para actualizar la NOTA (tarea principal) completada o no
+  // Ojo: no confundir con alternarSubtarea (abajo), que actualiza una subtarea
   async function alternarCompletada(nota) {
     const completada = !nota.completada
     const res = await fetch(`${API}/notas/${nota.id}`, {
@@ -85,9 +91,11 @@ function App() {
       body: JSON.stringify({ completada }),
     })
     const actualizada = await res.json()
+    // "..." (spread) copia la nota y solo reemplaza lo que cambió.
+    // Sin copiar, mutaríamos el objeto original y React no detectaría el cambio.
     setNotas(notas.map((n) => (n.id === nota.id ? actualizada : n)))
   }
-
+  // Solicitud de tipo POST para agregar una subtarea a una nota
   async function agregarSubtarea(notaId, texto) {
     const res = await fetch(`${API}/notas/${notaId}/subtareas`, {
       method: 'POST',
@@ -97,7 +105,8 @@ function App() {
       },
       body: JSON.stringify({ texto }),
     })
-    const nueva = await res.json()
+    const nueva = await res.json() 
+    // Agrego esta nueva subtarea a la lista de subtareas que tiene la nota
     setNotas(
       notas.map((n) =>
         n.id === notaId ? { ...n, subtareas: [...n.subtareas, nueva] } : n
@@ -128,12 +137,13 @@ function App() {
       )
     )
   }
-
+// Genero solicitud de tipo DELETE a la API para eliminar una subtarea
   async function eliminarSubtarea(notaId, subtareaId) {
     await fetch(`${API}/subtareas/${subtareaId}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     })
+    // Actualizo el array de subtareas para eliminar esa tarea
     setNotas(
       notas.map((n) =>
         n.id === notaId
@@ -142,7 +152,7 @@ function App() {
       )
     )
   }
-
+  // Verifico si no hay un token, en ese caso envio al usuario a la ventana de autenticacion
   if (!token) {
     return (
       <main className="notas">
@@ -163,7 +173,7 @@ function App() {
       </main>
     )
   }
-
+// Devuelvo de manera visual para el usuario la vista principal de la aplicacion
   return (
     <main className="notas">
       <div className="barra">

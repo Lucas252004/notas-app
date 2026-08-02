@@ -1,10 +1,10 @@
 import { useState } from 'react'
 
 function FormularioAuth({ titulo, onSubmit, alternativo }) {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-
+  const [email, setEmail] = useState('') // Correo electronico
+  const [password, setPassword] = useState('') // Contraseña
+  const [error, setError] = useState('') // Mensaje de error
+  // Funcion para verificar que los datos se hayan ingresado correctamente
   async function manejarSubmit(e) {
     e.preventDefault()
     setError('')
@@ -14,7 +14,7 @@ function FormularioAuth({ titulo, onSubmit, alternativo }) {
       setError(err.message)
     }
   }
-
+  // Estructura HTML del formulario 
   return (
     <form className="auth" onSubmit={manejarSubmit}>
       <div className="auth-logo" aria-hidden="true" />
