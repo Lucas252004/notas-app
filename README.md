@@ -1,14 +1,16 @@
 # Mis Notas 📝
 
-Aplicación fullstack de notas con registro de usuarios y base de datos. Cada usuario ve y administra sus propias notas.
+Aplicación fullstack de notas con registro de usuarios y base de datos. Cada usuario ve y administra sus propias notas, con subtareas y checkboxes.
+
+**🔗 Demo en producción:** https://notas-app-ebon.vercel.app
 
 ## Stack
 
 | Capa | Tecnología |
 |------|-----------|
-| Frontend | React + Vite |
-| Backend | Node.js + Express |
-| Base de datos | PostgreSQL |
+| Frontend | React + Vite (desplegado en Vercel) |
+| Backend | Node.js + Express (desplegado en Render) |
+| Base de datos | PostgreSQL (Neon, serverless) |
 | Autenticación | JWT + bcrypt |
 | Tests | Vitest (frontend), node:test (backend) |
 
@@ -16,6 +18,7 @@ Aplicación fullstack de notas con registro de usuarios y base de datos. Cada us
 
 - Registro e inicio de sesión con JWT
 - Crear, listar y eliminar notas
+- Tareas con subtareas y checkboxes (se tachan al completar)
 - Cada usuario solo ve y modifica sus propias notas
 - Persistencia en PostgreSQL
 - Cobertura de tests en frontend y backend
@@ -53,6 +56,25 @@ node index.js   # escucha en http://localhost:3001
 npm install
 npm run dev     # http://localhost:5173
 ```
+
+## Despliegue en producción
+
+| Servicio | URL | Costo |
+|----------|-----|-------|
+| Frontend (Vercel) | https://notas-app-ebon.vercel.app | $0 |
+| Backend (Render) | https://notas-app-api.onrender.com | $0 |
+| Base de datos (Neon) | PostgreSQL serverless | $0 |
+
+### Cómo está configurado
+
+- **Render**: web service del repo, root directory `server`, `npm start`. Variables de entorno: `DATABASE_URL`, `JWT_SECRET`, `CORS_ORIGIN`.
+- **Vercel**: detecta Vite automáticamente, variable `VITE_API_URL` apunta a la API de Render.
+- **Neon**: base de datos en la nube, el schema se aplicó con `schema.sql`.
+- **UptimeRobot** (opcional y gratis): un ping cada 5 min evita que el backend de Render "duerma" tras 15 min de inactividad (cold start).
+
+### Variables de entorno
+
+Ver `.env.example`. En producción se configuran en el panel de cada servicio.
 
 ## Tests
 
