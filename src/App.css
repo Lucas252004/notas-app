@@ -1,0 +1,79 @@
+.notas {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 0 16px;
+}
+
+.fila {
+  display: flex;
+  gap: 8px;
+}
+
+input {
+  padding: 8px;
+  flex: 1;
+}
+
+button {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 0 0;
+}
+
+li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8px 0;
+  padding: 8px;
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+li button {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+}
+
+.barra {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+button.link {
+  background: none;
+  border: none;
+  color: #2563eb;
+  text-decoration: underline;
+  padding: 0;
+  margin-top: 12px;
+}
+
+.auth {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 320px;
+}
+
+.auth h2 {
+  margin: 0 0 8px;
+}
+
+.auth input {
+  padding: 8px;
+}
+
+.error {
+  color: #b91c1c;
+  margin: 0;
+  font-size: 14px;
+}
